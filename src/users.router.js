@@ -23,5 +23,22 @@ usersRouter.post("/signup", async (req, res) => {
   return res.status(201).send(_.pick(newUser, ["name", "email"]));
 });
 
+// ici le user s'authentifie -> c'est le signin
+usersRouter.post("/auth", async (req, res) => {
+  const user = await User.findOne({ email: req.body.email });
+  if (!user) {
+    return res.status(404).send(`Email and/or password incorrect.`);
+  }
+  // ici on compare le password de la request avec celui du user
+  const validPassword = await bcrypt.compare(req.body.password, user.password);
+  if (!validPassword) {
+    return res.status(404).send(`Email and/or password incorrect.`);
+  }
+  const token = user.generateAuthToken();
+  return res.send({
+    access_token: token,
+  });
+});
+
 
 export default usersRouter;

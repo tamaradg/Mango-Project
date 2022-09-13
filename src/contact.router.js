@@ -3,18 +3,23 @@ import express from "express";
 import { Types } from "mongoose";
 import Contact from "./contact.model.js";
 import mongoose from "mongoose";
+import auth from "./auth.js";
+
 // ici on créé le router
 const contactsRouter = express.Router();
 
 // REAL ALL
 contactsRouter.get("/", async (_, res) => {
-  const contacts = await Contact.find().select("name phone email");
+  // on ajoute ici les champs qu'on veut voir apparaitre
+  const contacts = await Contact.find().select("name phone email owner");
   return res.send(contacts);
 });
 
 // CREATE
-contactsRouter.post("/", async (req, res) => {
+contactsRouter.post("/",auth , async (req, res) => {
   const contact = new Contact(req.body);
+  // ici on ajoute l'id du user qui créé le contact
+  contact.owner = req.user._id;
   await contact.save();
   return res.send(contact);
 });
@@ -33,7 +38,7 @@ contactsRouter.get("/:id", async (req, res) => {
 });
 
 //UPDATE ONE
-contactsRouter.patch("/:id", async (req, res) => {
+contactsRouter.patch("/:id", auth, async (req, res) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
     return res.sendStatus(404);
   }
@@ -62,7 +67,7 @@ contactsRouter.patch("/:id", async (req, res) => {
 });
 
 //DELETE ONE
-contactsRouter.delete("/:id", async (req, res) => {
+contactsRouter.delete("/:id", auth, async (req, res) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
     return res.sendStatus(404);
   }

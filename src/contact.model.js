@@ -15,6 +15,11 @@ const ContactSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    // ici on ajoute les infos du user qui crée le contact à la db
+    owner: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "users",
+    },
   },
   {
     timestamps: true,
