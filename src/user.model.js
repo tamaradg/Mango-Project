@@ -17,6 +17,13 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    owner: {
+
+      type: mongoose.Schema.Types.ObjectId,
+
+      ref: "users",
+
+    },
   },
   {
     timestamps: true,
@@ -31,7 +38,7 @@ UserSchema.methods.generateAuthToken = function () {
       _id: this._id,
       name: this.name,
     },
-    //process salt ?
+    //
     process.env.SECRET_KEY
   );
   return token;
